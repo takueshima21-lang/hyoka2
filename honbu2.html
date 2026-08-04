@@ -589,6 +589,6 @@ buildRankingScreen = function(rows, cls, period, isDemo) {
   rows = rows.map(r => ({...r, target: r.name || r.target || ''}));
   _origBuildRankingScreen(rows, cls, period, isDemo);
 };
-</script>
+const _orig=buildRankingScreen;buildRankingScreen=function(rows,cls,period,isDemo){rows=rows.map(r=>({...r,target:r.name||r.target||''}));_orig(rows,cls,period,isDemo);};</script>
 </body>
 </html>
