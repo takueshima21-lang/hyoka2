@@ -583,6 +583,12 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 const urlParams=new URLSearchParams(window.location.search);
 if(urlParams.get('name')||urlParams.get('target')){applyParams(urlParams);}
 else{showScreen('screen-admin');}
+// ランキング名前修正パッチ
+const _origBuildRankingScreen = buildRankingScreen;
+buildRankingScreen = function(rows, cls, period, isDemo) {
+  rows = rows.map(r => ({...r, target: r.name || r.target || ''}));
+  _origBuildRankingScreen(rows, cls, period, isDemo);
+};
 </script>
 </body>
 </html>
