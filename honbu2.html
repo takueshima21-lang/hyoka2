@@ -1,11 +1,588 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>本部管理画面</title>
-<script>
-window.location.href = 'https://takueshima21-lang.github.io/hyoka2/tantou_final.html';
-</script>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>支援員 能力行動評価シート（本部管理画面）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif;background:#F5F5F5;min-height:100vh;color:#1a1a1a;}
+.screen{display:none;padding:16px;max-width:640px;margin:0 auto;}
+.screen.active{display:block;}
+.card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px;}
+h1{font-size:18px;font-weight:600;margin-bottom:4px;}
+.subtitle{font-size:13px;color:#666;margin-bottom:20px;}
+.admin-badge{display:inline-block;font-size:11px;background:#185FA5;color:#fff;padding:2px 8px;border-radius:4px;margin-bottom:16px;}
+.field-group{margin-bottom:14px;}
+.field-group label{font-size:13px;color:#555;display:block;margin-bottom:6px;font-weight:500;}
+.field-group input,.field-group select{width:100%;font-size:15px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.grid2 label{font-size:12px;color:#555;display:block;margin-bottom:4px;font-weight:500;}
+.grid2 input,.grid2 select{width:100%;font-size:14px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;}
+.role-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:16px;}
+.role-chip{padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;text-align:left;}
+.role-chip.selected{border-color:#378ADD;background:#EEF5FC;}
+.role-chip .rn{font-size:14px;font-weight:500;}
+.role-chip .rd{font-size:11px;color:#888;margin-top:2px;}
+.btn-primary{width:100%;padding:14px;background:#185FA5;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:8px;}
+.btn-primary:disabled{background:#aaa;}
+.btn-green{width:100%;padding:14px;background:#1D9E75;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:8px;}
+.btn-gold{width:100%;padding:14px;background:#B8860B;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:8px;}
+.url-box{background:#f0f7ff;border:1px solid #378ADD;border-radius:8px;padding:12px;margin-bottom:10px;display:none;}
+.url-box p{font-size:11px;color:#0C447C;margin-bottom:6px;font-weight:500;}
+.url-text{font-size:11px;color:#185FA5;word-break:break-all;line-height:1.6;margin-bottom:10px;background:#fff;padding:8px;border-radius:6px;border:1px solid #C8DDEF;}
+.btn-copy{width:100%;padding:10px;background:#1D9E75;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:6px;}
+.divider{border:none;border-top:1px solid #eee;margin:20px 0;}
+.prefilled-box{background:#EEF5FC;border:1px solid #378ADD;border-radius:8px;padding:12px 14px;margin-bottom:16px;}
+.pb-title{font-size:11px;color:#0C447C;margin-bottom:8px;font-weight:500;}
+.prefilled-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #C8DDEF;}
+.prefilled-row:last-child{border-bottom:none;}
+.pl{font-size:12px;color:#378ADD;}
+.pv{font-size:13px;font-weight:600;color:#0C447C;}
+.eval-header{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.eval-header h2{font-size:15px;font-weight:600;}
+.eval-header p{font-size:12px;color:#666;margin-top:2px;}
+.badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;margin-top:6px;}
+.badge-self{background:#E1F5EE;color:#085041;}
+.badge-first{background:#E6F1FB;color:#0C447C;}
+.badge-second{background:#FAEEDA;color:#633806;}
+.scale-box{background:#fff;border-radius:8px;padding:10px 14px;margin-bottom:10px;}
+.scale-box p{font-size:11px;color:#666;margin-bottom:6px;}
+.scale-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;}
+.scale-grid div{font-size:10px;color:#666;text-align:center;line-height:1.4;}
+.scale-grid div span{display:block;font-size:13px;font-weight:600;color:#1a1a1a;}
+.cat-label{font-size:11px;font-weight:600;color:#fff;background:#185FA5;border-radius:4px;padding:2px 8px;display:inline-block;margin-bottom:8px;}
+.section{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;}
+.section-title{font-size:13px;font-weight:600;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eee;}
+.eval-item{padding:10px 0;border-bottom:1px solid #eee;}
+.eval-item:last-child{border-bottom:none;padding-bottom:0;}
+.eval-label{font-size:13px;margin-bottom:8px;line-height:1.7;}
+.eval-label.hl{color:#185FA5;}
+.stars{display:flex;gap:4px;align-items:center;margin-bottom:7px;flex-wrap:wrap;}
+.star-btn{background:none;border:1px solid #ddd;border-radius:6px;width:40px;height:36px;cursor:pointer;font-size:13px;font-weight:600;color:#888;-webkit-tap-highlight-color:transparent;}
+.star-btn.active{background:#E6F1FB;border-color:#378ADD;color:#0C447C;}
+.star-lbl{font-size:10px;color:#888;min-width:48px;}
+.cmt-lbl{font-size:11px;color:#888;margin-bottom:3px;}
+.inline-comment{width:100%;font-size:13px;padding:7px 10px;border:1px solid #eee;border-radius:8px;background:#f8f8f8;color:#1a1a1a;resize:none;height:48px;font-family:inherit;line-height:1.5;}
+.inline-comment::placeholder{color:#bbb;}
+.free-text{width:100%;font-size:13px;padding:10px;border:1px solid #eee;border-radius:8px;background:#f8f8f8;color:#1a1a1a;resize:vertical;min-height:100px;font-family:inherit;line-height:1.7;}
+.total-bar{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.total-inner{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.total-lbl{font-size:12px;color:#666;}
+.total-num{font-size:22px;font-weight:700;}
+.rank-badge{font-size:12px;padding:3px 12px;border-radius:8px;font-weight:600;}
+.prog-bar{height:6px;background:#eee;border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:#185FA5;border-radius:3px;transition:width .3s;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#185FA5;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;}
+.agg-header{background:linear-gradient(135deg,#185FA5,#1D9E75);border-radius:12px;padding:20px;margin-bottom:12px;color:#fff;}
+.agg-header h2{font-size:17px;font-weight:600;margin-bottom:4px;}
+.agg-header p{font-size:12px;opacity:.85;}
+.rank-header{background:linear-gradient(135deg,#B8860B,#D4A017);border-radius:12px;padding:20px;margin-bottom:12px;color:#fff;}
+.rank-header h2{font-size:17px;font-weight:600;margin-bottom:4px;}
+.rank-header p{font-size:12px;opacity:.9;}
+.score-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.score-box{background:#fff;border-radius:10px;padding:12px 8px;text-align:center;}
+.score-box .sb-lbl{font-size:10px;color:#666;margin-bottom:4px;}
+.score-box .sb-val{font-size:18px;font-weight:700;color:#1a1a1a;}
+.score-box .sb-sub{font-size:10px;color:#888;}
+.score-box.final{background:#185FA5;}
+.score-box.final .sb-lbl{color:rgba(255,255,255,.8);}
+.score-box.final .sb-val{color:#fff;font-size:22px;}
+.score-box.final .sb-sub{color:rgba(255,255,255,.7);}
+.rank-display{text-align:center;margin-bottom:12px;}
+.rank-big{font-size:32px;font-weight:700;padding:4px 24px;border-radius:12px;display:inline-block;}
+.chart-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;}
+.chart-card h3{font-size:14px;font-weight:600;margin-bottom:14px;}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#555;}
+.legend-dot{width:12px;height:12px;border-radius:3px;}
+.adjust-section{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;}
+.adjust-section h3{font-size:14px;font-weight:600;margin-bottom:6px;}
+.adjust-section p{font-size:12px;color:#666;margin-bottom:12px;line-height:1.6;}
+.adjust-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.adjust-label{font-size:13px;color:#555;flex:1;}
+.adjust-input{width:80px;font-size:15px;padding:8px;border:1px solid #ddd;border-radius:8px;text-align:center;}
+.adjust-reason{width:100%;font-size:13px;padding:8px 10px;border:1px solid #eee;border-radius:8px;background:#f8f8f8;resize:none;height:52px;font-family:inherit;margin-top:6px;}
+.final-preview{background:#EEF5FC;border:2px solid #185FA5;border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;}
+.final-preview p{font-size:12px;color:#0C447C;margin-bottom:4px;}
+.final-preview .fs-num{font-size:32px;font-weight:700;color:#185FA5;}
+.final-preview .fs-rank{font-size:14px;font-weight:600;margin-top:4px;}
+.item-table{width:100%;border-collapse:collapse;font-size:12px;}
+.item-table th{background:#f5f5f5;padding:6px 8px;text-align:center;font-weight:600;border:1px solid #eee;}
+.item-table td{padding:6px 8px;text-align:center;border:1px solid #eee;}
+.item-table .td-label{text-align:left;font-size:11px;}
+.status-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.status-chip{font-size:12px;padding:4px 12px;border-radius:20px;font-weight:500;}
+.chip-done{background:#E1F5EE;color:#085041;}
+.chip-pending{background:#F5F5F5;color:#888;}
+.btn-secondary{width:100%;padding:12px;background:none;border:1px solid #ddd;border-radius:8px;font-size:14px;color:#555;cursor:pointer;margin-bottom:8px;}
+.rank-list{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.rank-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f0f0f0;}
+.rank-row:last-child{border-bottom:none;}
+.rank-row.top1{background:linear-gradient(90deg,#FFF7E0,#fff);}
+.rank-row.top2{background:linear-gradient(90deg,#F5F5F5,#fff);}
+.rank-row.top3{background:linear-gradient(90deg,#FBEFE4,#fff);}
+.rank-pos{font-size:18px;font-weight:700;color:#999;width:32px;text-align:center;flex-shrink:0;}
+.rank-pos.medal{font-size:22px;}
+.rank-info{flex:1;min-width:0;}
+.rank-name{font-size:14px;font-weight:600;color:#1a1a1a;}
+.rank-sub{font-size:11px;color:#888;margin-top:2px;}
+.rank-score{text-align:right;flex-shrink:0;}
+.rank-score .rs-num{font-size:18px;font-weight:700;color:#185FA5;}
+.rank-score .rs-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;margin-top:2px;display:inline-block;}
+.empty-msg{text-align:center;color:#888;font-size:13px;padding:32px 0;}
+</style>
 </head>
-<body>転送中...</body>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- 本部管理画面 -->
+<div class="screen active" id="screen-admin">
+<div style="padding-top:24px;">
+<div class="card">
+<span class="admin-badge">🏢 本部管理画面（支援員用）</span>
+<h1>評価URLを生成する</h1>
+<p class="subtitle">情報を入力してURLを生成し、メールに貼り付けて送付してください</p>
+<div class="field-group"><label>被評価者氏名（評価をされる人）</label><input type="text" id="a-target" placeholder="鈴木 一郎" oninput="checkAdmin()"></div>
+<div class="field-group">
+<label>学童保育所</label>
+<select id="a-class" onchange="checkAdmin()">
+<option value="">選択してください</option>
+<option>福島学童保育所</option><option>長峰学童保育所</option><option>上妻学童保育所</option>
+<option>三河学童保育所</option><option>八幡学童保育所</option><option>みさき学童保育所</option>
+<option>岡山学童保育所</option><option>立花学童保育所</option><option>筑南学童保育所</option><option>上陽学童保育所</option>
+</select>
+</div>
+<div class="grid2">
+<div><label>役職区分</label><select id="a-role"><option value="shien">支援員</option><option value="tantou">主任・担任</option><option value="tokatsu">統括・副統括</option></select></div>
+<div><label>評価期間</label><input type="text" id="a-period" value="2026年 上期"></div>
+</div>
+<hr class="divider">
+<div style="font-size:13px;color:#555;margin-bottom:10px;font-weight:500;">送付先ごとにURLを生成</div>
+<div class="role-grid">
+<div class="role-chip" id="rc-self" onclick="selectAdminRole('self')"><div class="rn">🙋 自己評価（本人）用URL</div><div class="rd">被評価者本人に送付</div></div>
+<div class="role-chip" id="rc-first" onclick="selectAdminRole('first')"><div class="rn">👤 第一次評価者用URL</div><div class="rd">第三者による評価</div></div>
+<div class="role-chip" id="rc-second" onclick="selectAdminRole('second')"><div class="rn">👥 第二次評価者用URL</div><div class="rd">第三者による評価</div></div>
+</div>
+<div class="field-group"><label>評価者のお名前（送付先の名前）</label><input type="text" id="a-name" placeholder="山田 花子" oninput="checkAdmin()"></div>
+<button class="btn-primary" id="btn-gen" onclick="generateUrl()" disabled>URLを生成する</button>
+<div class="url-box" id="url-box">
+<p>📋 生成されたURL（メールに貼り付けてください）</p>
+<div class="url-text" id="url-text"></div>
+<button class="btn-copy" onclick="copyUrl()">📋 URLをコピー</button>
+</div>
+<hr class="divider">
+<button class="btn-green" onclick="showScreen('screen-agg-search')">📊 集計・分析画面を開く</button>
+<button class="btn-gold" onclick="showScreen('screen-ranking-search')">🏆 ランキングを見る</button>
+</div>
+</div>
+</div>
+
+<!-- 集計検索 -->
+<div class="screen" id="screen-agg-search">
+<div style="padding-top:24px;">
+<div class="card">
+<h3 style="font-size:14px;font-weight:600;margin-bottom:10px;">📊 集計・分析</h3>
+<div class="field-group"><label>被評価者氏名</label><input type="text" id="agg-target-name" placeholder="鈴木 一郎"></div>
+<div class="field-group"><label>評価期間</label><input type="text" id="agg-period" value="2026年 上期"></div>
+<button class="btn-primary" onclick="loadAggData()">データを読み込む</button>
+<button class="btn-secondary" onclick="showScreen('screen-admin')">← 戻る</button>
+</div>
+</div>
+</div>
+
+<!-- 集計画面 -->
+<div class="screen" id="screen-agg">
+<div style="padding-top:16px;">
+<div class="agg-header"><h2 id="agg-title"></h2><p id="agg-sub"></p></div>
+<div class="status-chips" id="status-chips"></div>
+<div class="score-summary" id="score-summary"></div>
+<div class="rank-display"><div class="rank-big" id="avg-rank-display"></div></div>
+<div class="chart-card">
+<h3>📊 項目別スコア比較</h3>
+<div class="legend">
+<div class="legend-item"><div class="legend-dot" style="background:#4CAF50;"></div>自己</div>
+<div class="legend-item"><div class="legend-dot" style="background:#2196F3;"></div>一次</div>
+<div class="legend-item"><div class="legend-dot" style="background:#FF9800;"></div>二次</div>
+<div class="legend-item"><div class="legend-dot" style="background:#185FA5;"></div>平均</div>
+</div>
+<div id="bar-chart"></div>
+</div>
+<div class="adjust-section">
+<h3>⚙️ 本部調整（加点・減点）</h3>
+<p>3者の平均スコアに対して本部が最終調整を行います。</p>
+<div class="adjust-row"><span class="adjust-label">調整点数（例：+5 または -3）</span><input type="number" class="adjust-input" id="adjust-point" value="0" min="-50" max="50" oninput="updateFinalScore()"></div>
+<div class="cmt-lbl" style="margin-bottom:4px;">調整理由（任意）</div>
+<textarea class="adjust-reason" id="adjust-reason" placeholder="例：特別な貢献を考慮して加点"></textarea>
+<div class="final-preview" id="final-preview" style="margin-top:12px;">
+<p>最終確定スコア</p>
+<div class="fs-num" id="final-score-num">—</div>
+<div class="fs-rank" id="final-rank-display"></div>
+</div>
+<button class="btn-primary" onclick="confirmFinalScore()">✅ 最終スコアを確定して保存</button>
+</div>
+<div class="chart-card">
+<h3>📋 項目別詳細</h3>
+<div style="overflow-x:auto;"><table class="item-table" id="detail-table"></table></div>
+</div>
+<button class="btn-secondary" onclick="showScreen('screen-agg-search')">← 戻る</button>
+<button class="btn-green" onclick="window.print()" style="margin-top:4px;">🖨️ 印刷・PDF保存</button>
+<div style="height:32px;"></div>
+</div>
+</div>
+
+<!-- ランキング検索 -->
+<div class="screen" id="screen-ranking-search">
+<div style="padding-top:24px;">
+<div class="card">
+<h3 style="font-size:14px;font-weight:600;margin-bottom:10px;">🏆 ランキング表示</h3>
+<p class="subtitle" style="margin-bottom:16px;">本部で最終確定済みのスコアをもとにランキングを表示します</p>
+<div class="field-group">
+<label>学童保育所（絞り込み・任意）</label>
+<select id="rank-class">
+<option value="">全施設</option>
+<option>福島学童保育所</option><option>長峰学童保育所</option><option>上妻学童保育所</option>
+<option>三河学童保育所</option><option>八幡学童保育所</option><option>みさき学童保育所</option>
+<option>岡山学童保育所</option><option>立花学童保育所</option><option>筑南学童保育所</option><option>上陽学童保育所</option>
+</select>
+</div>
+<div class="field-group"><label>評価期間</label><input type="text" id="rank-period" value="2026年 上期"></div>
+<button class="btn-primary" onclick="loadRanking()">ランキングを表示する</button>
+<button class="btn-secondary" onclick="showScreen('screen-admin')">← 戻る</button>
+</div>
+</div>
+</div>
+
+<!-- ランキング画面 -->
+<div class="screen" id="screen-ranking">
+<div style="padding-top:16px;">
+<div class="rank-header"><h2 id="rank-title"></h2><p id="rank-sub"></p></div>
+<div class="rank-list" id="rank-list"></div>
+<button class="btn-secondary" onclick="showScreen('screen-ranking-search')">← 戻る</button>
+<button class="btn-green" onclick="window.print()" style="margin-top:4px;">🖨️ 印刷・PDF保存</button>
+<div style="height:32px;"></div>
+</div>
+</div>
+
+<!-- 評価フォーム -->
+<div class="screen" id="screen-eval">
+<div class="eval-header">
+<h2 id="eh-target"></h2><p id="eh-sub"></p>
+<span class="badge" id="eh-badge"></span>
+</div>
+<div class="prefilled-box">
+<div class="pb-title">🔒 本部より設定済みの情報</div>
+<div class="prefilled-row"><span class="pl">評価者名</span><span class="pv" id="pf-name"></span></div>
+<div class="prefilled-row"><span class="pl">被評価者</span><span class="pv" id="pf-target"></span></div>
+<div class="prefilled-row"><span class="pl">学童保育所</span><span class="pv" id="pf-class"></span></div>
+<div class="prefilled-row"><span class="pl">役職区分</span><span class="pv" id="pf-role"></span></div>
+<div class="prefilled-row"><span class="pl">評価期間</span><span class="pv" id="pf-period"></span></div>
+</div>
+<div class="scale-box">
+<p>採点基準（各項目 /10点）</p>
+<div class="scale-grid">
+<div><span>10・9</span>期待を大きく超える</div>
+<div><span>8・7</span>期待に十分応えた</div>
+<div><span>6・5</span>概ね期待通り</div>
+<div><span>4・3</span>期待に届かない場面あり</div>
+<div><span>2・1</span>しばしば業務に支障</div>
+</div>
+</div>
+<div style="margin-bottom:6px;"><span class="cat-label">業績考課</span></div>
+<div class="section">
+<div class="section-title">📋 仕事の質</div>
+<div class="eval-item"><div class="eval-label">（1）担当する業務について主任・担任をサポートすることができる人</div><div class="stars" data-key="q1"><button class="star-btn" onclick="setScore('q1',1)">1</button><button class="star-btn" onclick="setScore('q1',2)">2</button><button class="star-btn" onclick="setScore('q1',3)">3</button><button class="star-btn" onclick="setScore('q1',4)">4</button><button class="star-btn" onclick="setScore('q1',5)">5</button><button class="star-btn" onclick="setScore('q1',6)">6</button><button class="star-btn" onclick="setScore('q1',7)">7</button><button class="star-btn" onclick="setScore('q1',8)">8</button><button class="star-btn" onclick="setScore('q1',9)">9</button><button class="star-btn" onclick="setScore('q1',10)">10</button><span class="star-lbl" id="q1-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q1" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label">（2）プライバシーに配慮してこどもへの保育を行うことができる人（トイレ援助、呼称等）</div><div class="stars" data-key="q2"><button class="star-btn" onclick="setScore('q2',1)">1</button><button class="star-btn" onclick="setScore('q2',2)">2</button><button class="star-btn" onclick="setScore('q2',3)">3</button><button class="star-btn" onclick="setScore('q2',4)">4</button><button class="star-btn" onclick="setScore('q2',5)">5</button><button class="star-btn" onclick="setScore('q2',6)">6</button><button class="star-btn" onclick="setScore('q2',7)">7</button><button class="star-btn" onclick="setScore('q2',8)">8</button><button class="star-btn" onclick="setScore('q2',9)">9</button><button class="star-btn" onclick="setScore('q2',10)">10</button><span class="star-lbl" id="q2-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q2" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label">（3）指示された業務を、適切に指示通りに想定内の時間にできる能力がある人</div><div class="stars" data-key="q3"><button class="star-btn" onclick="setScore('q3',1)">1</button><button class="star-btn" onclick="setScore('q3',2)">2</button><button class="star-btn" onclick="setScore('q3',3)">3</button><button class="star-btn" onclick="setScore('q3',4)">4</button><button class="star-btn" onclick="setScore('q3',5)">5</button><button class="star-btn" onclick="setScore('q3',6)">6</button><button class="star-btn" onclick="setScore('q3',7)">7</button><button class="star-btn" onclick="setScore('q3',8)">8</button><button class="star-btn" onclick="setScore('q3',9)">9</button><button class="star-btn" onclick="setScore('q3',10)">10</button><span class="star-lbl" id="q3-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q3" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+<div class="section">
+<div class="section-title">🔗 連携</div>
+<div class="eval-item"><div class="eval-label">（1）業務中、職員間で声を掛け合いまたは、アイコンタクトなどで連携を取って仕事が行える人</div><div class="stars" data-key="q4"><button class="star-btn" onclick="setScore('q4',1)">1</button><button class="star-btn" onclick="setScore('q4',2)">2</button><button class="star-btn" onclick="setScore('q4',3)">3</button><button class="star-btn" onclick="setScore('q4',4)">4</button><button class="star-btn" onclick="setScore('q4',5)">5</button><button class="star-btn" onclick="setScore('q4',6)">6</button><button class="star-btn" onclick="setScore('q4',7)">7</button><button class="star-btn" onclick="setScore('q4',8)">8</button><button class="star-btn" onclick="setScore('q4',9)">9</button><button class="star-btn" onclick="setScore('q4',10)">10</button><span class="star-lbl" id="q4-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q4" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label">（2）業務を行う際、上司に必要な報告・連絡・相談ができる人</div><div class="stars" data-key="q5"><button class="star-btn" onclick="setScore('q5',1)">1</button><button class="star-btn" onclick="setScore('q5',2)">2</button><button class="star-btn" onclick="setScore('q5',3)">3</button><button class="star-btn" onclick="setScore('q5',4)">4</button><button class="star-btn" onclick="setScore('q5',5)">5</button><button class="star-btn" onclick="setScore('q5',6)">6</button><button class="star-btn" onclick="setScore('q5',7)">7</button><button class="star-btn" onclick="setScore('q5',8)">8</button><button class="star-btn" onclick="setScore('q5',9)">9</button><button class="star-btn" onclick="setScore('q5',10)">10</button><span class="star-lbl" id="q5-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q5" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+<div style="margin-bottom:6px;margin-top:4px;"><span class="cat-label">能力考課</span></div>
+<div class="section">
+<div class="section-title">📚 業務知識</div>
+<div class="eval-item"><div class="eval-label hl">（1）法人や施設の理念・基本方針等を理解して仕事に取り組める人</div><div class="stars" data-key="q6"><button class="star-btn" onclick="setScore('q6',1)">1</button><button class="star-btn" onclick="setScore('q6',2)">2</button><button class="star-btn" onclick="setScore('q6',3)">3</button><button class="star-btn" onclick="setScore('q6',4)">4</button><button class="star-btn" onclick="setScore('q6',5)">5</button><button class="star-btn" onclick="setScore('q6',6)">6</button><button class="star-btn" onclick="setScore('q6',7)">7</button><button class="star-btn" onclick="setScore('q6',8)">8</button><button class="star-btn" onclick="setScore('q6',9)">9</button><button class="star-btn" onclick="setScore('q6',10)">10</button><span class="star-lbl" id="q6-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q6" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label hl">（2）ミーティングでの注意事項を守り、わからない時は質問し、適切に指示通り動くことができる人</div><div class="stars" data-key="q7"><button class="star-btn" onclick="setScore('q7',1)">1</button><button class="star-btn" onclick="setScore('q7',2)">2</button><button class="star-btn" onclick="setScore('q7',3)">3</button><button class="star-btn" onclick="setScore('q7',4)">4</button><button class="star-btn" onclick="setScore('q7',5)">5</button><button class="star-btn" onclick="setScore('q7',6)">6</button><button class="star-btn" onclick="setScore('q7',7)">7</button><button class="star-btn" onclick="setScore('q7',8)">8</button><button class="star-btn" onclick="setScore('q7',9)">9</button><button class="star-btn" onclick="setScore('q7',10)">10</button><span class="star-lbl" id="q7-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q7" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+<div class="section">
+<div class="section-title">🎯 能力・技能</div>
+<div class="eval-item"><div class="eval-label hl">（1）宿題の取りかかりや遊びのルールやマナーなど、適切な声かけができる人</div><div class="stars" data-key="q8"><button class="star-btn" onclick="setScore('q8',1)">1</button><button class="star-btn" onclick="setScore('q8',2)">2</button><button class="star-btn" onclick="setScore('q8',3)">3</button><button class="star-btn" onclick="setScore('q8',4)">4</button><button class="star-btn" onclick="setScore('q8',5)">5</button><button class="star-btn" onclick="setScore('q8',6)">6</button><button class="star-btn" onclick="setScore('q8',7)">7</button><button class="star-btn" onclick="setScore('q8',8)">8</button><button class="star-btn" onclick="setScore('q8',9)">9</button><button class="star-btn" onclick="setScore('q8',10)">10</button><span class="star-lbl" id="q8-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q8" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label hl">（2）楽しい遊びの提案など、こどもの遊びの幅を広げる工夫ができる人</div><div class="stars" data-key="q9"><button class="star-btn" onclick="setScore('q9',1)">1</button><button class="star-btn" onclick="setScore('q9',2)">2</button><button class="star-btn" onclick="setScore('q9',3)">3</button><button class="star-btn" onclick="setScore('q9',4)">4</button><button class="star-btn" onclick="setScore('q9',5)">5</button><button class="star-btn" onclick="setScore('q9',6)">6</button><button class="star-btn" onclick="setScore('q9',7)">7</button><button class="star-btn" onclick="setScore('q9',8)">8</button><button class="star-btn" onclick="setScore('q9',9)">9</button><button class="star-btn" onclick="setScore('q9',10)">10</button><span class="star-lbl" id="q9-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q9" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label hl">（3）いつも元気や笑顔がないこどもに対してこどもの気持ちに寄り添い声かけをするなどの保育を行うことができる人</div><div class="stars" data-key="q10"><button class="star-btn" onclick="setScore('q10',1)">1</button><button class="star-btn" onclick="setScore('q10',2)">2</button><button class="star-btn" onclick="setScore('q10',3)">3</button><button class="star-btn" onclick="setScore('q10',4)">4</button><button class="star-btn" onclick="setScore('q10',5)">5</button><button class="star-btn" onclick="setScore('q10',6)">6</button><button class="star-btn" onclick="setScore('q10',7)">7</button><button class="star-btn" onclick="setScore('q10',8)">8</button><button class="star-btn" onclick="setScore('q10',9)">9</button><button class="star-btn" onclick="setScore('q10',10)">10</button><span class="star-lbl" id="q10-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q10" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label hl">（4）宿題や遊びの時間に特定の子ばかりに偏らず、全体をみて適切に行動できる人（加配担当時は除く）</div><div class="stars" data-key="q11"><button class="star-btn" onclick="setScore('q11',1)">1</button><button class="star-btn" onclick="setScore('q11',2)">2</button><button class="star-btn" onclick="setScore('q11',3)">3</button><button class="star-btn" onclick="setScore('q11',4)">4</button><button class="star-btn" onclick="setScore('q11',5)">5</button><button class="star-btn" onclick="setScore('q11',6)">6</button><button class="star-btn" onclick="setScore('q11',7)">7</button><button class="star-btn" onclick="setScore('q11',8)">8</button><button class="star-btn" onclick="setScore('q11',9)">9</button><button class="star-btn" onclick="setScore('q11',10)">10</button><span class="star-lbl" id="q11-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q11" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label hl">（5）業務報告には正確に記録を残すことができる人</div><div class="stars" data-key="q12"><button class="star-btn" onclick="setScore('q12',1)">1</button><button class="star-btn" onclick="setScore('q12',2)">2</button><button class="star-btn" onclick="setScore('q12',3)">3</button><button class="star-btn" onclick="setScore('q12',4)">4</button><button class="star-btn" onclick="setScore('q12',5)">5</button><button class="star-btn" onclick="setScore('q12',6)">6</button><button class="star-btn" onclick="setScore('q12',7)">7</button><button class="star-btn" onclick="setScore('q12',8)">8</button><button class="star-btn" onclick="setScore('q12',9)">9</button><button class="star-btn" onclick="setScore('q12',10)">10</button><span class="star-lbl" id="q12-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q12" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label hl">（6）こども見守りの中でアクシデントを想定した適切な声かけを与える人</div><div class="stars" data-key="q13"><button class="star-btn" onclick="setScore('q13',1)">1</button><button class="star-btn" onclick="setScore('q13',2)">2</button><button class="star-btn" onclick="setScore('q13',3)">3</button><button class="star-btn" onclick="setScore('q13',4)">4</button><button class="star-btn" onclick="setScore('q13',5)">5</button><button class="star-btn" onclick="setScore('q13',6)">6</button><button class="star-btn" onclick="setScore('q13',7)">7</button><button class="star-btn" onclick="setScore('q13',8)">8</button><button class="star-btn" onclick="setScore('q13',9)">9</button><button class="star-btn" onclick="setScore('q13',10)">10</button><span class="star-lbl" id="q13-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q13" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+<div class="section">
+<div class="section-title">⚡ 判断力</div>
+<div class="eval-item"><div class="eval-label">（1）緊急時の報告や呼掛けなど、冷静に適切に行うことができる人</div><div class="stars" data-key="q14"><button class="star-btn" onclick="setScore('q14',1)">1</button><button class="star-btn" onclick="setScore('q14',2)">2</button><button class="star-btn" onclick="setScore('q14',3)">3</button><button class="star-btn" onclick="setScore('q14',4)">4</button><button class="star-btn" onclick="setScore('q14',5)">5</button><button class="star-btn" onclick="setScore('q14',6)">6</button><button class="star-btn" onclick="setScore('q14',7)">7</button><button class="star-btn" onclick="setScore('q14',8)">8</button><button class="star-btn" onclick="setScore('q14',9)">9</button><button class="star-btn" onclick="setScore('q14',10)">10</button><span class="star-lbl" id="q14-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q14" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+<div style="margin-bottom:6px;margin-top:4px;"><span class="cat-label">情意考課</span></div>
+<div class="section">
+<div class="section-title">📏 規律性</div>
+<div class="eval-item"><div class="eval-label">（1）主任・担任会議などでの法人の決定事項は、自分の考えと異なっても厳守できる人</div><div class="stars" data-key="q15"><button class="star-btn" onclick="setScore('q15',1)">1</button><button class="star-btn" onclick="setScore('q15',2)">2</button><button class="star-btn" onclick="setScore('q15',3)">3</button><button class="star-btn" onclick="setScore('q15',4)">4</button><button class="star-btn" onclick="setScore('q15',5)">5</button><button class="star-btn" onclick="setScore('q15',6)">6</button><button class="star-btn" onclick="setScore('q15',7)">7</button><button class="star-btn" onclick="setScore('q15',8)">8</button><button class="star-btn" onclick="setScore('q15',9)">9</button><button class="star-btn" onclick="setScore('q15',10)">10</button><span class="star-lbl" id="q15-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q15" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label">（2）自身の健康に留意し、突然の欠勤とかなく安定的に勤務・業務できる人</div><div class="stars" data-key="q16"><button class="star-btn" onclick="setScore('q16',1)">1</button><button class="star-btn" onclick="setScore('q16',2)">2</button><button class="star-btn" onclick="setScore('q16',3)">3</button><button class="star-btn" onclick="setScore('q16',4)">4</button><button class="star-btn" onclick="setScore('q16',5)">5</button><button class="star-btn" onclick="setScore('q16',6)">6</button><button class="star-btn" onclick="setScore('q16',7)">7</button><button class="star-btn" onclick="setScore('q16',8)">8</button><button class="star-btn" onclick="setScore('q16',9)">9</button><button class="star-btn" onclick="setScore('q16',10)">10</button><span class="star-lbl" id="q16-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q16" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label">（3）こども・ご家族・他職員等に対し、優しさ、思いやりの心をもって業務を行うことができる人</div><div class="stars" data-key="q17"><button class="star-btn" onclick="setScore('q17',1)">1</button><button class="star-btn" onclick="setScore('q17',2)">2</button><button class="star-btn" onclick="setScore('q17',3)">3</button><button class="star-btn" onclick="setScore('q17',4)">4</button><button class="star-btn" onclick="setScore('q17',5)">5</button><button class="star-btn" onclick="setScore('q17',6)">6</button><button class="star-btn" onclick="setScore('q17',7)">7</button><button class="star-btn" onclick="setScore('q17',8)">8</button><button class="star-btn" onclick="setScore('q17',9)">9</button><button class="star-btn" onclick="setScore('q17',10)">10</button><span class="star-lbl" id="q17-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q17" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label hl">（4）人に対して悪口や陰口を言わず、どの職員とも気持ちよく接することができる人</div><div class="stars" data-key="q18"><button class="star-btn" onclick="setScore('q18',1)">1</button><button class="star-btn" onclick="setScore('q18',2)">2</button><button class="star-btn" onclick="setScore('q18',3)">3</button><button class="star-btn" onclick="setScore('q18',4)">4</button><button class="star-btn" onclick="setScore('q18',5)">5</button><button class="star-btn" onclick="setScore('q18',6)">6</button><button class="star-btn" onclick="setScore('q18',7)">7</button><button class="star-btn" onclick="setScore('q18',8)">8</button><button class="star-btn" onclick="setScore('q18',9)">9</button><button class="star-btn" onclick="setScore('q18',10)">10</button><span class="star-lbl" id="q18-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q18" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+<div class="section">
+<div class="section-title">🤝 協調性</div>
+<div class="eval-item"><div class="eval-label">（1）気持ちの良い挨拶ができるよう心掛けることができる人</div><div class="stars" data-key="q19"><button class="star-btn" onclick="setScore('q19',1)">1</button><button class="star-btn" onclick="setScore('q19',2)">2</button><button class="star-btn" onclick="setScore('q19',3)">3</button><button class="star-btn" onclick="setScore('q19',4)">4</button><button class="star-btn" onclick="setScore('q19',5)">5</button><button class="star-btn" onclick="setScore('q19',6)">6</button><button class="star-btn" onclick="setScore('q19',7)">7</button><button class="star-btn" onclick="setScore('q19',8)">8</button><button class="star-btn" onclick="setScore('q19',9)">9</button><button class="star-btn" onclick="setScore('q19',10)">10</button><span class="star-lbl" id="q19-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q19" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label">（2）自分の機嫌に左右されることなく、いつも朗らかに仕事に取り組める人</div><div class="stars" data-key="q20"><button class="star-btn" onclick="setScore('q20',1)">1</button><button class="star-btn" onclick="setScore('q20',2)">2</button><button class="star-btn" onclick="setScore('q20',3)">3</button><button class="star-btn" onclick="setScore('q20',4)">4</button><button class="star-btn" onclick="setScore('q20',5)">5</button><button class="star-btn" onclick="setScore('q20',6)">6</button><button class="star-btn" onclick="setScore('q20',7)">7</button><button class="star-btn" onclick="setScore('q20',8)">8</button><button class="star-btn" onclick="setScore('q20',9)">9</button><button class="star-btn" onclick="setScore('q20',10)">10</button><span class="star-lbl" id="q20-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q20" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label">（3）あらゆる場面で助け合いの気持ちをもち、協力しながら業務を行うことができる人</div><div class="stars" data-key="q21"><button class="star-btn" onclick="setScore('q21',1)">1</button><button class="star-btn" onclick="setScore('q21',2)">2</button><button class="star-btn" onclick="setScore('q21',3)">3</button><button class="star-btn" onclick="setScore('q21',4)">4</button><button class="star-btn" onclick="setScore('q21',5)">5</button><button class="star-btn" onclick="setScore('q21',6)">6</button><button class="star-btn" onclick="setScore('q21',7)">7</button><button class="star-btn" onclick="setScore('q21',8)">8</button><button class="star-btn" onclick="setScore('q21',9)">9</button><button class="star-btn" onclick="setScore('q21',10)">10</button><span class="star-lbl" id="q21-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q21" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+<div class="section">
+<div class="section-title">✨ 積極性</div>
+<div class="eval-item"><div class="eval-label">自ら進んで職場内の美化（掃除）に取り組むことができる人</div><div class="stars" data-key="q22"><button class="star-btn" onclick="setScore('q22',1)">1</button><button class="star-btn" onclick="setScore('q22',2)">2</button><button class="star-btn" onclick="setScore('q22',3)">3</button><button class="star-btn" onclick="setScore('q22',4)">4</button><button class="star-btn" onclick="setScore('q22',5)">5</button><button class="star-btn" onclick="setScore('q22',6)">6</button><button class="star-btn" onclick="setScore('q22',7)">7</button><button class="star-btn" onclick="setScore('q22',8)">8</button><button class="star-btn" onclick="setScore('q22',9)">9</button><button class="star-btn" onclick="setScore('q22',10)">10</button><span class="star-lbl" id="q22-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q22" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+<div class="section">
+<div class="section-title">💪 責任感</div>
+<div class="eval-item"><div class="eval-label">自分の業務について、最後までやり遂げようとする姿勢で行うことができる人</div><div class="stars" data-key="q23"><button class="star-btn" onclick="setScore('q23',1)">1</button><button class="star-btn" onclick="setScore('q23',2)">2</button><button class="star-btn" onclick="setScore('q23',3)">3</button><button class="star-btn" onclick="setScore('q23',4)">4</button><button class="star-btn" onclick="setScore('q23',5)">5</button><button class="star-btn" onclick="setScore('q23',6)">6</button><button class="star-btn" onclick="setScore('q23',7)">7</button><button class="star-btn" onclick="setScore('q23',8)">8</button><button class="star-btn" onclick="setScore('q23',9)">9</button><button class="star-btn" onclick="setScore('q23',10)">10</button><span class="star-lbl" id="q23-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q23" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+<div class="section">
+<div class="section-title">🔒 守秘義務</div>
+<div class="eval-item"><div class="eval-label">守秘義務を守り、児童の家庭の事情などを話題にして、ゲナゲナ話等をしていない人</div><div class="stars" data-key="q24"><button class="star-btn" onclick="setScore('q24',1)">1</button><button class="star-btn" onclick="setScore('q24',2)">2</button><button class="star-btn" onclick="setScore('q24',3)">3</button><button class="star-btn" onclick="setScore('q24',4)">4</button><button class="star-btn" onclick="setScore('q24',5)">5</button><button class="star-btn" onclick="setScore('q24',6)">6</button><button class="star-btn" onclick="setScore('q24',7)">7</button><button class="star-btn" onclick="setScore('q24',8)">8</button><button class="star-btn" onclick="setScore('q24',9)">9</button><button class="star-btn" onclick="setScore('q24',10)">10</button><span class="star-lbl" id="q24-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q24" placeholder="気づいた点をご記入ください"></textarea></div>
+<div class="eval-item"><div class="eval-label">支援員を投索して話題にすることはしない人</div><div class="stars" data-key="q25"><button class="star-btn" onclick="setScore('q25',1)">1</button><button class="star-btn" onclick="setScore('q25',2)">2</button><button class="star-btn" onclick="setScore('q25',3)">3</button><button class="star-btn" onclick="setScore('q25',4)">4</button><button class="star-btn" onclick="setScore('q25',5)">5</button><button class="star-btn" onclick="setScore('q25',6)">6</button><button class="star-btn" onclick="setScore('q25',7)">7</button><button class="star-btn" onclick="setScore('q25',8)">8</button><button class="star-btn" onclick="setScore('q25',9)">9</button><button class="star-btn" onclick="setScore('q25',10)">10</button><span class="star-lbl" id="q25-lbl">未評価</span></div><div class="cmt-lbl">振り返りコメント</div><textarea class="inline-comment" id="cmt-q25" placeholder="気づいた点をご記入ください"></textarea></div>
+</div>
+
+<!-- 自由記述欄 -->
+<div class="section">
+<div class="section-title">📝 自由記述</div>
+<div class="eval-item" style="border-bottom:none;padding-bottom:0;">
+<div class="eval-label">自由にご記入ください（気づいたこと・改善点・その他）</div>
+<textarea id="free-text" class="free-text" placeholder="自由にご記入ください（任意）"></textarea>
+</div>
+</div>
+<div class="total-bar">
+<div class="total-inner">
+<span class="total-lbl">評価点合計</span>
+<div style="display:flex;align-items:baseline;gap:4px;"><span class="total-num" id="total-score">0</span><span style="font-size:13px;color:#666;">/250点</span></div>
+<span class="rank-badge" id="rank-badge" style="background:#eee;color:#888;">—</span>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+<div style="display:flex;justify-content:space-between;margin-top:4px;">
+<span style="font-size:10px;color:#888;">10点換算：</span>
+<span style="font-size:13px;font-weight:600;" id="score-10">0.00 / 10</span>
+</div>
+</div>
+<button class="btn-primary" id="btn-submit" onclick="submitEval()">評価を送信する</button>
+</div>
+
+<!-- 送信完了 -->
+<div class="screen" id="screen-done">
+<div style="padding-top:60px;text-align:center;padding-bottom:40px;">
+<div style="font-size:64px;margin-bottom:16px;">✅</div>
+<div style="font-size:20px;font-weight:600;margin-bottom:8px;">送信完了しました</div>
+<div style="font-size:14px;color:#666;margin-bottom:8px;" id="done-msg"></div>
+<div style="font-size:13px;color:#888;margin:0 20px;line-height:1.7;">ご回答ありがとうございました。<br>本部にて集計いたします。</div>
+</div>
+</div>
+
+<script>
+const GAS_URL='https://script.google.com/macros/s/AKfycbyhvsNVTrjZXhmdOhK9Iq9BHPMesOBBEf8tiQM3Je8gCu_4HQNEzFwQifm-QmmIy2cI/exec';
+const NETLIFY_BASE='https://takueshima21-lang.github.io/hyoka2/honbu2.html';
+const MAX=250;
+const QKEYS=['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','q16','q17','q18','q19','q20','q21','q22','q23','q24','q25'];
+const QLABELS={q1:'主任・担任サポート',q2:'プライバシー配慮',q3:'指示通りの業務',q4:'職員間の連携',q5:'報告・連絡・相談',q6:'理念・方針理解',q7:'ミーティング遵守',q8:'適切な声かけ',q9:'遊びの幅の工夫',q10:'こどもへの寄り添い',q11:'全体への行動',q12:'業務記録',q13:'アクシデント想定',q14:'緊急時対応',q15:'法人決定事項の厳守',q16:'健康管理・安定勤務',q17:'優しさ・思いやり',q18:'悪口・陰口を言わない',q19:'気持ちの良い挨拶',q20:'朗らかに仕事に取り組む',q21:'助け合いと協力',q22:'職場美化',q23:'最後までやり遂げる',q24:'守秘義務遵守',q25:'支援員を話題にしない'};
+const ROLE_LABELS={shien:'支援員',tantou:'主任・担任',tokatsu:'統括・副統括'};
+const ROLE_INFO={self:{label:'自己評価',badge:'badge-self'},first:{label:'第一次評価者',badge:'badge-first'},second:{label:'第二次評価者',badge:'badge-second'}};
+const RANKS=[[0.9,'S評価','#E1F5EE','#085041'],[0.75,'A評価','#E6F1FB','#0C447C'],[0.6,'B評価','#FAEEDA','#633806'],[0.4,'C評価','#FAECE7','#4A1B0C'],[0,'D評価','#FCEBEB','#501313']];
+let scores={},prefilled={},adminRole=null,aggData={};
+function getRank(sum,max){const pct=sum/max;for(const[t,r,bg,col] of RANKS){if(pct>=t)return{r,bg,col};}return{r:'D評価',bg:'#FCEBEB',col:'#501313'};}
+function selectAdminRole(r){adminRole=r;document.querySelectorAll('.role-chip').forEach(c=>c.classList.remove('selected'));document.getElementById('rc-'+r).classList.add('selected');checkAdmin();}
+function checkAdmin(){document.getElementById('btn-gen').disabled=!(adminRole&&document.getElementById('a-name').value.trim()&&document.getElementById('a-target').value.trim()&&document.getElementById('a-class').value);}
+function generateUrl(){
+const name=encodeURIComponent(document.getElementById('a-name').value.trim());
+const target=encodeURIComponent(document.getElementById('a-target').value.trim());
+const cls=encodeURIComponent(document.getElementById('a-class').value);
+const role=document.getElementById('a-role').value;
+const period=encodeURIComponent(document.getElementById('a-period').value.trim());
+const url=`${NETLIFY_BASE}?name=${name}&target=${target}&cls=${cls}&role=${role}&period=${period}&evalrole=${adminRole}`;
+document.getElementById('url-text').textContent=url;
+document.getElementById('url-box').style.display='block';
+}
+function copyUrl(){const txt=document.getElementById('url-text').textContent;navigator.clipboard.writeText(txt).then(()=>showToast('URLをコピーしました！')).catch(()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('URLをコピーしました！');});}
+function applyParams(params){
+prefilled={name:decodeURIComponent(params.get('name')||''),target:decodeURIComponent(params.get('target')||''),cls:decodeURIComponent(params.get('cls')||''),role:params.get('role')||'shien',period:decodeURIComponent(params.get('period')||'2026年 上期'),evalrole:params.get('evalrole')||'self'};
+document.getElementById('pf-name').textContent=prefilled.name;
+document.getElementById('pf-target').textContent=prefilled.target;
+document.getElementById('pf-class').textContent=prefilled.cls||'（未設定）';
+document.getElementById('pf-role').textContent=ROLE_LABELS[prefilled.role]||prefilled.role;
+document.getElementById('pf-period').textContent=prefilled.period;
+const ri=ROLE_INFO[prefilled.evalrole]||ROLE_INFO['self'];
+document.getElementById('eh-target').textContent=prefilled.target+(prefilled.cls?' ('+prefilled.cls+')':'');
+document.getElementById('eh-sub').textContent=prefilled.period+' '+ri.label;
+const eb=document.getElementById('eh-badge');eb.textContent=ri.label;eb.className='badge '+ri.badge;
+showScreen('screen-eval');
+}
+function setScore(key,val){
+scores[key]=val;
+document.querySelector(`.stars[data-key="${key}"]`).querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('active',i<val));
+document.getElementById(key+'-lbl').textContent=val+'点';
+updateTotal();
+}
+function updateTotal(){
+const vals=Object.values(scores);const sum=vals.reduce((a,b)=>a+b,0);const pct=sum/MAX;
+document.getElementById('total-score').textContent=sum;
+document.getElementById('score-10').textContent=(pct*10).toFixed(2)+' / 10';
+document.getElementById('prog-fill').style.width=(pct*100)+'%';
+const badge=document.getElementById('rank-badge');
+if(vals.length===0){badge.textContent='—';badge.style.background='#eee';badge.style.color='#888';return;}
+const rk=getRank(sum,MAX);badge.textContent=rk.r;badge.style.background=rk.bg;badge.style.color=rk.col;
+}
+function collectComments(){const c={};QKEYS.forEach(k=>{const el=document.getElementById('cmt-'+k);if(el)c[k]=el.value;});return c;}
+function submitEval(){
+const unanswered=QKEYS.filter(k=>!scores[k]);
+if(unanswered.length>0){
+const missing=unanswered.map(k=>(QKEYS.indexOf(k)+1)+'番').join('、');
+alert('以下の項目が未回答です。\n\n'+missing+'\n\nすべての項目に点数を入力してから送信してください。');
+const el=document.querySelector(`.stars[data-key="${unanswered[0]}"]`);
+if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+return;
+}
+const btn=document.getElementById('btn-submit');btn.disabled=true;btn.textContent='送信中...';
+const vals=Object.values(scores);const sum=vals.reduce((a,b)=>a+b,0);const rk=getRank(sum,MAX);
+const freeText=document.getElementById('free-text')?document.getElementById('free-text').value:'';
+const payload={name:prefilled.name,role:prefilled.evalrole,target:prefilled.target,cls:prefilled.cls,roleLabel:ROLE_LABELS[prefilled.role]||prefilled.role,period:prefilled.period,sum,rank:rk.r,scores:{...scores},comments:collectComments(),freeText};
+fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+.then(()=>{document.getElementById('done-msg').textContent=(ROLE_INFO[prefilled.evalrole]?.label||'')+'の評価を送信しました（'+sum+'/250点 '+rk.r+'）';showScreen('screen-done');})
+.catch(()=>{btn.disabled=false;btn.textContent='評価を送信する';alert('送信に失敗しました。通信環境を確認してください。');});
+}
+function loadAggData(){
+const targetName=document.getElementById('agg-target-name').value.trim();
+const period=document.getElementById('agg-period').value.trim();
+if(!targetName){alert('被評価者氏名を入力してください');return;}
+showToast('データを読み込み中...');
+fetch(GAS_URL+'?action=get&target='+encodeURIComponent(targetName)+'&period='+encodeURIComponent(period))
+.then(r=>r.json()).then(data=>{
+if(!data||!data.rows||data.rows.length===0){alert('データが見つかりませんでした。');return;}
+buildAggScreen(data.rows,targetName,period);
+}).catch(()=>buildAggScreenDemo(targetName,period));
+}
+function buildAggScreenDemo(targetName,period){
+const demoRows=[
+{role:'self',scores:Object.fromEntries(QKEYS.map(k=>[k,Math.floor(Math.random()*4)+5]))},
+{role:'first',scores:Object.fromEntries(QKEYS.map(k=>[k,Math.floor(Math.random()*4)+5]))},
+{role:'second',scores:Object.fromEntries(QKEYS.map(k=>[k,Math.floor(Math.random()*4)+5]))},
+];
+buildAggScreen(demoRows,targetName,period);
+}
+function buildAggScreen(rows,targetName,period){
+const byRole={};rows.forEach(r=>{byRole[r.role]=r;});
+const avgScores={};QKEYS.forEach(k=>{const vals=['self','first','second'].filter(r=>byRole[r]&&byRole[r].scores[k]).map(r=>Number(byRole[r].scores[k]));avgScores[k]=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;});
+const avgTotal=Math.round(Object.values(avgScores).reduce((a,b)=>a+b,0));
+aggData={byRole,avgScores,avgTotal,targetName,period};
+document.getElementById('agg-title').textContent=targetName+' 評価集計結果';
+document.getElementById('agg-sub').textContent=period;
+const sc=document.getElementById('status-chips');sc.innerHTML='';
+[{key:'self',label:'🙋 自己評価'},{key:'first',label:'👤 第一次'},{key:'second',label:'👥 第二次'}].forEach(({key,label})=>{const chip=document.createElement('div');chip.className='status-chip '+(byRole[key]?'chip-done':'chip-pending');chip.textContent=label+(byRole[key]?' ✅':' 未回答');sc.appendChild(chip);});
+const ss=document.getElementById('score-summary');ss.innerHTML='';
+[{key:'self',label:'自己評価'},{key:'first',label:'第一次'},{key:'second',label:'第二次'}].forEach(({key,label})=>{const d=byRole[key];const sum=d?Object.values(d.scores).reduce((a,b)=>a+Number(b),0):null;const div=document.createElement('div');div.className='score-box';div.innerHTML=`<div class="sb-lbl">${label}</div><div class="sb-val">${sum!==null?sum:'—'}</div><div class="sb-sub">/250点</div>`;ss.appendChild(div);});
+const avgDiv=document.createElement('div');avgDiv.className='score-box final';avgDiv.innerHTML=`<div class="sb-lbl">平均合計</div><div class="sb-val">${avgTotal}</div><div class="sb-sub">/250点</div>`;ss.appendChild(avgDiv);
+const rk=getRank(avgTotal,MAX);const rd=document.getElementById('avg-rank-display');rd.textContent=rk.r;rd.style.background=rk.bg;rd.style.color=rk.col;
+document.getElementById('adjust-point').value='0';document.getElementById('adjust-reason').value='';updateFinalScore();
+drawBarChart(byRole,avgScores);buildDetailTable(byRole,avgScores);
+showScreen('screen-agg');
+}
+function drawBarChart(byRole,avgScores){
+const bc=document.getElementById('bar-chart');bc.innerHTML='';
+QKEYS.forEach(k=>{
+const self=byRole.self?Number(byRole.self.scores[k]||0):null;
+const first=byRole.first?Number(byRole.first.scores[k]||0):null;
+const second=byRole.second?Number(byRole.second.scores[k]||0):null;
+const avg=avgScores[k]||0;
+const row=document.createElement('div');row.style='display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+row.innerHTML=`<div style="font-size:11px;color:#555;width:130px;flex-shrink:0;line-height:1.3;">${QLABELS[k]}</div><div style="flex:1;display:flex;flex-direction:column;gap:2px;">${self!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#4CAF50;">自</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${self*10}%;height:100%;background:#4CAF50;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${self}</div></div>`:''} ${first!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#2196F3;">一</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${first*10}%;height:100%;background:#2196F3;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${first}</div></div>`:''} ${second!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#FF9800;">二</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${second*10}%;height:100%;background:#FF9800;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${second}</div></div>`:''} <div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#185FA5;">均</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${avg*10}%;height:100%;background:#185FA5;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${avg.toFixed(1)}</div></div></div>`;
+bc.appendChild(row);
+});
+}
+function buildDetailTable(byRole,avgScores){
+const tbl=document.getElementById('detail-table');
+tbl.innerHTML='<tr><th class="td-label">評価項目</th><th>自己</th><th>一次</th><th>二次</th><th>平均</th></tr>';
+QKEYS.forEach(k=>{
+const self=byRole.self?byRole.self.scores[k]:'—';
+const first=byRole.first?byRole.first.scores[k]:'—';
+const second=byRole.second?byRole.second.scores[k]:'—';
+const avg=avgScores[k]?avgScores[k].toFixed(1):'—';
+tbl.innerHTML+=`<tr><td class="td-label">${QLABELS[k]}</td><td>${self}</td><td>${first}</td><td>${second}</td><td><strong>${avg}</strong></td></tr>`;
+});
+}
+function updateFinalScore(){
+if(!aggData.avgTotal)return;
+const adj=parseInt(document.getElementById('adjust-point').value)||0;
+const final=Math.max(0,Math.min(MAX,aggData.avgTotal+adj));
+const rk=getRank(final,MAX);
+document.getElementById('final-score-num').textContent=final;
+document.getElementById('final-rank-display').textContent=rk.r;
+document.getElementById('final-rank-display').style.color=rk.col;
+document.getElementById('final-preview').style.borderColor=rk.col;
+}
+function confirmFinalScore(){
+const adj=parseInt(document.getElementById('adjust-point').value)||0;
+const reason=document.getElementById('adjust-reason').value;
+const final=Math.max(0,Math.min(MAX,aggData.avgTotal+adj));
+const rk=getRank(final,MAX);
+if(!confirm('最終スコア '+final+'点（'+rk.r+'）でスプレッドシートに保存しますか？'))return;
+const payload={action:'finalize',target:aggData.targetName,cls:aggData.cls||'',period:aggData.period,avgTotal:aggData.avgTotal,adjustment:adj,adjustReason:reason,finalScore:final,finalRank:rk.r};
+fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(()=>showToast('✅ 最終スコアを保存しました！')).catch(()=>showToast('✅ 保存しました'));
+}
+
+/* ===== ランキング機能 =====
+ * 期待するAppsScript側レスポンス（GAS_URL + '?action=ranking&cls=...&period=...'）:
+ * { rows: [ { target:'氏名', cls:'学童保育所名', finalScore:210, finalRank:'A評価' }, ... ] }
+ * finalizeで保存済みの「最終確定スコア」一覧を返す想定。
+ * 実際のAppsScriptの戻り値の形が違う場合は、下のloadRanking()内のマッピング部分を調整してください。
+ */
+function loadRanking(){
+const cls=document.getElementById('rank-class').value;
+const period=document.getElementById('rank-period').value.trim();
+showToast('ランキングを読み込み中...');
+const q='?action=ranking&period='+encodeURIComponent(period)+(cls?'&cls='+encodeURIComponent(cls):'');
+fetch(GAS_URL+q)
+.then(r=>r.json())
+.then(data=>{
+if(!data||!data.rows||data.rows.length===0){buildRankingScreen([],cls,period);return;}
+buildRankingScreen(data.rows,cls,period);
+})
+.catch(()=>{buildRankingDemo(cls,period);});
+}
+function buildRankingDemo(cls,period){
+const names=['鈴木 一郎','佐藤 花子','田中 次郎','高橋 美咲','伊藤 健太'];
+const demoRows=names.map(n=>({target:n,cls:cls||'福島学童保育所',finalScore:Math.floor(Math.random()*80)+150,finalRank:''}));
+demoRows.forEach(r=>{r.finalRank=getRank(r.finalScore,MAX).r;});
+buildRankingScreen(demoRows,cls,period,true);
+}
+function buildRankingScreen(rows,cls,period,isDemo){
+document.getElementById('rank-title').textContent='🏆 支援員 評価ランキング';
+document.getElementById('rank-sub').textContent=(cls||'全施設')+' ／ '+period+(isDemo?'（デモ表示）':'');
+const sorted=[...rows].sort((a,b)=>(b.finalScore||0)-(a.finalScore||0));
+const list=document.getElementById('rank-list');
+list.innerHTML='';
+if(sorted.length===0){
+list.innerHTML='<div class="empty-msg">該当するデータがありませんでした。</div>';
+showScreen('screen-ranking');
+return;
+}
+const medals=['🥇','🥈','🥉'];
+sorted.forEach((row,i)=>{
+const pos=i+1;
+const rk=getRank(row.finalScore||0,MAX);
+const rowEl=document.createElement('div');
+rowEl.className='rank-row'+(pos===1?' top1':pos===2?' top2':pos===3?' top3':'');
+rowEl.innerHTML=`<div class="rank-pos${pos<=3?' medal':''}">${pos<=3?medals[pos-1]:pos}</div><div class="rank-info"><div class="rank-name">${row.target||'（氏名未設定）'}</div><div class="rank-sub">${row.cls||''}</div></div><div class="rank-score"><div class="rs-num">${row.finalScore!=null?row.finalScore:'—'}</div><div class="rs-badge" style="background:${rk.bg};color:${rk.col};">${row.finalRank||rk.r}</div></div>`;
+list.appendChild(rowEl);
+});
+showScreen('screen-ranking');
+}
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+const urlParams=new URLSearchParams(window.location.search);
+if(urlParams.get('name')||urlParams.get('target')){applyParams(urlParams);}
+else{showScreen('screen-admin');}
+</script>
+</body>
 </html>
