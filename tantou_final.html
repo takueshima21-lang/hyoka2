@@ -480,7 +480,7 @@ bc.appendChild(row);
 }
 function buildDetailTable(byRole,avgScores){
 const tbl=document.getElementById('detail-table');
-tbl.innerHTML='<tr><th class="td-label">評価項目</th><th>自己</th><th>一次</th><th>二次</th><th>平均</th></tr>';
+tbl.innerHTML='<tr><th class="td-label">評価項目</th><th>自己</th><th>一次</th><th>二次</th><th>三次</th><th>四次</th><th>平均</th></tr>';
 QKEYS.forEach(k=>{
 const self=byRole.self?byRole.self.scores[k]:'—';
 const first=byRole.first?byRole.first.scores[k]:'—';
