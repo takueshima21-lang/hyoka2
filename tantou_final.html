@@ -451,7 +451,7 @@ buildAggScreen(demoRows,targetName,period);
 }
 function buildAggScreen(rows,targetName,period){
 const byRole={};rows.forEach(r=>{byRole[r.role]=r;});
-const avgScores={};QKEYS.forEach(k=>{const vals=['self','first','second'].filter(r=>byRole[r]&&byRole[r].scores[k]).map(r=>Number(byRole[r].scores[k]));avgScores[k]=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;});
+const avgScores={};QKEYS.forEach(k=>{const vals=['self','first','second','third','fourth'].filter(r=>byRole[r]&&byRole[r].scores[k]).map(r=>Number(byRole[r].scores[k]));avgScores[k]=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;});
 const avgTotal=Math.round(Object.values(avgScores).reduce((a,b)=>a+b,0));
 aggData={byRole,avgScores,avgTotal,targetName,period};
 document.getElementById('agg-title').textContent=targetName+' 評価集計結果';
