@@ -354,7 +354,7 @@ const MAX=250;
 const QKEYS=['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','q16','q17','q18','q19','q20','q21','q22','q23','q24','q25'];
 const QLABELS={q1:'方針の伝達',q2:'率先垂範',q3:'現場課題の吸い上げ',q4:'調整力',q5:'理念の体現',q6:'危機対応',q7:'安全・衛生管理',q8:'変革推進',q9:'業務達成',q10:'協調性',q11:'創意工夫',q12:'後進の育成',q13:'指導的態度',q14:'意見の尊重',q15:'チームワーク構築',q16:'モチベーション',q17:'職員指導',q18:'公平・公正',q19:'謙虚さと自己開示',q20:'規範意識',q21:'傾聴と共感',q22:'言行一致と人望',q23:'こどもとの関係性',q24:'外部連携',q25:'自己研鑽'};
 const ROLE_LABELS={shien:'支援員',tantou:'主任・担任',tokatsu:'統括・副統括'};
-const ROLE_INFO={self:{label:'自己評価',badge:'badge-self'},first:{label:'第一次評価者',badge:'badge-first'},second:{label:'第二次評価者',badge:'badge-second'}};
+const ROLE_INFO={self:{label:'自己評価',badge:'badge-self'},first:{label:'第一次評価者',badge:'badge-first'}second:{label:'第二次評価者',badge:'badge-second'},third:{label:'第三次評価者',badge:'badge-third'},fourth:{label:'第四次評価者',badge:'badge-fourth'},',badge:'badge-second'}};
 const RANKS=[[0.9,'S評価','#E1F5EE','#085041'],[0.75,'A評価','#E6F1FB','#0C447C'],[0.6,'B評価','#FAEEDA','#633806'],[0.4,'C評価','#FAECE7','#4A1B0C'],[0,'D評価','#FCEBEB','#501313']];
 let scores={},prefilled={},adminRole=null,aggData={};
 function getRank(sum,max){const pct=sum/max;for(const[t,r,bg,col] of RANKS){if(pct>=t)return{r,bg,col};}return{r:'D評価',bg:'#FCEBEB',col:'#501313'};}
