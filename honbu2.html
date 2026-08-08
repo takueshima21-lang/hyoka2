@@ -514,7 +514,8 @@ const avg=avgScores[k]?avgScores[k].toFixed(1):'—';
 tbl.innerHTML+=`<tr><td class="td-label">${QLABELS[k]}</td><td>${self}</td><td>${first}</td><td>${second}</td><td><strong>${avg}</strong></td></tr>`;
 });
 }
-function updateFinalScore(){// コメント表示
+// コメント表示
+function updateFinalScore(){
 const cmtDiv=document.getElementById('comment-section');
 if(cmtDiv){
 const roles=[{key:'self',label:'自己評価'},{key:'first',label:'第一次'},{key:'second',label:'第二次'},{key:'third',label:'第三次'},{key:'fourth',label:'第四次'}];
