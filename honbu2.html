@@ -503,7 +503,7 @@ row.innerHTML=`<div style="font-size:11px;color:#555;width:130px;flex-shrink:0;l
 bc.appendChild(row);
 });
 }
-function buildDetailTable(byRole,avgScores){
+function buildDetailTable(byRole,avgScores){Ｆ
 const tbl=document.getElementById('detail-table');
 tbl.innerHTML='<tr><th class="td-label">評価項目</th><th>自己</th><th>一次</th><th>二次</th><th>三次</th><th>四次</th><th>平均</th></tr>';
 QKEYS.forEach(k=>{
@@ -514,7 +514,23 @@ const avg=avgScores[k]?avgScores[k].toFixed(1):'—';
 tbl.innerHTML+=`<tr><td class="td-label">${QLABELS[k]}</td><td>${self}</td><td>${first}</td><td>${second}</td><td><strong>${avg}</strong></td></tr>`;
 });
 }
-function updateFinalScore(){
+function updateFinalScore(){// コメント表示
+const cmtDiv=document.getElementById('comment-section');
+if(cmtDiv){
+const roles=[{key:'self',label:'自己評価'},{key:'first',label:'第一次'},{key:'second',label:'第二次'},{key:'third',label:'第三次'},{key:'fourth',label:'第四次'}];
+let html='<div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;"><h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">💬 振り返りコメント</h3>';
+roles.forEach(({key,label})=>{
+if(!byRole[key]||!byRole[key].comments)return;
+const comments=byRole[key].comments;
+const hasComment=QKEYS.some(k=>comments[k]&&comments[k].trim());
+if(!hasComment)return;
+html+=`<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:#185FA5;margin-bottom:6px;">${label}</div>`;
+QKEYS.forEach(k=>{if(comments[k]&&comments[k].trim()){html+=`<div style="font-size:12px;padding:6px 10px;background:#f8f8f8;border-radius:6px;margin-bottom:4px;"><span style="color:#888;">${QLABELS[k]}：</span>${comments[k]}</div>`;}});
+html+='</div>';
+});
+html+='</div>';
+cmtDiv.innerHTML=html;
+}
 if(!aggData.avgTotal)return;
 const adj=parseInt(document.getElementById('adjust-point').value)||0;
 const final=Math.max(0,Math.min(MAX,aggData.avgTotal+adj));
