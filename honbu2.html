@@ -433,7 +433,7 @@ function submitEval(){
   const freeText=document.getElementById('free-text')?document.getElementById('free-text').value:'';
   const payload={name:prefilled.name,role:prefilled.evalrole,target:prefilled.target,cls:prefilled.cls,roleLabel:ROLE_LABELS[prefilled.role]||prefilled.role,period:prefilled.period,sum,rank:rk.r,scores:{...scores},comments:collectComments(),freeText};
   fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
-    .then(()=>{document.getElementById('done-msg').textContent=(ROLE_INFO[prefilled.evalrole]?.label||'')+'の評価を送信しました（'+sum+'/250点　'+rk.r+'）';showScreen('screen-done');})
+    .then(()=>{document.getElementById('done-msg').textContent=(ROLE_INFO[prefilled.evalrole]?.label||'')+'の評価を送信しました（'+sum+'/250点　'+rk.r+'）';localStorage.setItem('submitted_'+window.location.search,'1');showScreen('screen-done');})
     .catch(()=>{btn.disabled=false;btn.textContent='評価を送信する';alert('送信に失敗しました。通信環境を確認してください。');});
 }
 
