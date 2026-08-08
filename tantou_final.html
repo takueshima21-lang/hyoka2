@@ -539,8 +539,13 @@ tbl.innerHTML+=`<tr class="${cls}"><td class="rn">${i+1}</td><td class="nm">${ro
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 const urlParams=new URLSearchParams(window.location.search);
-if(urlParams.get('name')||urlParams.get('target')){applyParams(urlParams);}
-else{showScreen('screen-admin');}
+if(urlParams.get('name')||urlParams.get('target')){
+const submitKey='submitted_'+window.location.search;
+if(localStorage.getItem(submitKey)){
+document.getElementById('done-msg').textContent='この評価は送信済みです。';
+showScreen('screen-done');
+}else{applyParams(urlParams);}
+}else{showScreen('screen-admin');}
 </script>
 </body>
 </html>
