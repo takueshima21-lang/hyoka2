@@ -147,6 +147,8 @@ h1{font-size:18px;font-weight:600;margin-bottom:4px;}
 <div class="role-chip" id="rc-self" onclick="selectAdminRole('self')"><div class="rn">🙋 自己評価（本人）用URL</div><div class="rd">被評価者本人に送付</div></div>
 <div class="role-chip" id="rc-first" onclick="selectAdminRole('first')"><div class="rn">👤 第一次評価者用URL</div><div class="rd">第三者による評価</div></div>
 <div class="role-chip" id="rc-second" onclick="selectAdminRole('second')"><div class="rn">👥 第二次評価者用URL</div><div class="rd">第三者による評価</div></div>
+<div class="role-chip" id="rc-third" onclick="selectAdminRole('third')"><div class="rn">👥 第三次評価者用URL</div><div class="rd">第三者による評価</div></div>
+<div class="role-chip" id="rc-fourth" onclick="selectAdminRole('fourth')"><div class="rn">👥 第四次評価者用URL</div><div class="rd">第三者による評価</div></div>
 </div>
 <div class="field-group"><label>評価者のお名前（送付先の名前）</label><input type="text" id="a-name" placeholder="山田 花子" oninput="checkAdmin()"></div>
 <button class="btn-primary" id="btn-gen" onclick="generateUrl()" disabled>URLを生成する</button>
@@ -434,15 +436,15 @@ buildAggScreen(demoRows,targetName,period);
 }
 function buildAggScreen(rows,targetName,period){
 const byRole={};rows.forEach(r=>{byRole[r.role]=r;});
-const avgScores={};QKEYS.forEach(k=>{const vals=['self','first','second'].filter(r=>byRole[r]&&byRole[r].scores[k]).map(r=>Number(byRole[r].scores[k]));avgScores[k]=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;});
+const avgScores={};QKEYS.forEach(k=>{const vals=['self','first','second','third','fourth'].filter(r=>byRole[r]&&byRole[r].scores[k]).map(r=>Number(byRole[r].scores[k]));avgScores[k]=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;});
 const avgTotal=Math.round(Object.values(avgScores).reduce((a,b)=>a+b,0));
 aggData={byRole,avgScores,avgTotal,targetName,period};
 document.getElementById('agg-title').textContent=targetName+' 評価集計結果';
 document.getElementById('agg-sub').textContent=period;
 const sc=document.getElementById('status-chips');sc.innerHTML='';
-[{key:'self',label:'🙋 自己評価'},{key:'first',label:'👤 第一次'},{key:'second',label:'👥 第二次'}].forEach(({key,label})=>{const chip=document.createElement('div');chip.className='status-chip '+(byRole[key]?'chip-done':'chip-pending');chip.textContent=label+(byRole[key]?' ✅':' 未回答');sc.appendChild(chip);});
+[{key:'self',label:'🙋 自己評価'},{key:'first',label:'👤 第一次'},{key:'second',label:'👥 第二次'},{key:'third',label:'👥 第三次'},{key:'fourth',label:'👥 第四次'}].forEach(({key,label})=>{const chip=document.createElement('div');chip.className='status-chip '+(byRole[key]?'chip-done':'chip-pending');chip.textContent=label+(byRole[key]?' ✅':' 未回答');sc.appendChild(chip);});
 const ss=document.getElementById('score-summary');ss.innerHTML='';
-[{key:'self',label:'自己評価'},{key:'first',label:'第一次'},{key:'second',label:'第二次'}].forEach(({key,label})=>{const d=byRole[key];const sum=d?Object.values(d.scores).reduce((a,b)=>a+Number(b),0):null;const div=document.createElement('div');div.className='score-box';div.innerHTML=`<div class="sb-lbl">${label}</div><div class="sb-val">${sum!==null?sum:'—'}</div><div class="sb-sub">/250点</div>`;ss.appendChild(div);});
+[{key:'self',label:'自己評価'},{key:'first',label:'第一次'},{key:'second',label:'第二次'},{key:'third',label:'第三次'},{key:'fourth',label:'第四次'}].forEach(({key,label})=>{const d=byRole[key];const sum=d?Object.values(d.scores).reduce((a,b)=>a+Number(b),0):null;const div=document.createElement('div');div.className='score-box';div.innerHTML=`<div class="sb-lbl">${label}</div><div class="sb-val">${sum!==null?sum:'—'}</div><div class="sb-sub">/250点</div>`;ss.appendChild(div);});
 const avgDiv=document.createElement('div');avgDiv.className='score-box final';avgDiv.innerHTML=`<div class="sb-lbl">平均合計</div><div class="sb-val">${avgTotal}</div><div class="sb-sub">/250点</div>`;ss.appendChild(avgDiv);
 const rk=getRank(avgTotal,MAX);const rd=document.getElementById('avg-rank-display');rd.textContent=rk.r;rd.style.background=rk.bg;rd.style.color=rk.col;
 document.getElementById('adjust-point').value='0';document.getElementById('adjust-reason').value='';updateFinalScore();
@@ -455,21 +457,25 @@ QKEYS.forEach(k=>{
 const self=byRole.self?Number(byRole.self.scores[k]||0):null;
 const first=byRole.first?Number(byRole.first.scores[k]||0):null;
 const second=byRole.second?Number(byRole.second.scores[k]||0):null;
+const third=byRole.third?Number(byRole.third.scores[k]||0):null;
+const fourth=byRole.fourth?Number(byRole.fourth.scores[k]||0):null;
 const avg=avgScores[k]||0;
 const row=document.createElement('div');row.style='display:flex;align-items:center;gap:8px;margin-bottom:8px;';
-row.innerHTML=`<div style="font-size:11px;color:#555;width:130px;flex-shrink:0;line-height:1.3;">${QLABELS[k]}</div><div style="flex:1;display:flex;flex-direction:column;gap:2px;">${self!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#4CAF50;">自</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${self*10}%;height:100%;background:#4CAF50;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${self}</div></div>`:''} ${first!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#2196F3;">一</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${first*10}%;height:100%;background:#2196F3;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${first}</div></div>`:''} ${second!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#FF9800;">二</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${second*10}%;height:100%;background:#FF9800;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${second}</div></div>`:''} <div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#0E7A5F;">均</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${avg*10}%;height:100%;background:#0E7A5F;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${avg.toFixed(1)}</div></div></div>`;
+row.innerHTML=`<div style="font-size:11px;color:#555;width:130px;flex-shrink:0;line-height:1.3;">${QLABELS[k]}</div><div style="flex:1;display:flex;flex-direction:column;gap:2px;">${self!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#4CAF50;">自</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${self*10}%;height:100%;background:#4CAF50;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${self}</div></div>`:''} ${first!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#2196F3;">一</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${first*10}%;height:100%;background:#2196F3;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${first}</div></div>`:''} ${second!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#FF9800;">二</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${second*10}%;height:100%;background:#FF9800;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${second}</div></div>`:''} ${third!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#9C27B0;">三</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${third*10}%;height:100%;background:#9C27B0;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${third}</div></div>`:''} ${fourth!==null?`<div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#F44336;">四</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${fourth*10}%;height:100%;background:#F44336;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${fourth}</div></div>`:''} <div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;font-size:9px;color:#0E7A5F;">均</div><div style="flex:1;background:#f0f0f0;border-radius:3px;height:10px;overflow:hidden;"><div style="width:${avg*10}%;height:100%;background:#0E7A5F;border-radius:3px;"></div></div><div style="font-size:10px;width:18px;text-align:right;">${avg.toFixed(1)}</div></div></div>`;
 bc.appendChild(row);
 });
 }
 function buildDetailTable(byRole,avgScores){
 const tbl=document.getElementById('detail-table');
-tbl.innerHTML='<tr><th class="td-label">評価項目</th><th>自己</th><th>一次</th><th>二次</th><th>平均</th></tr>';
+tbl.innerHTML='<tr><th class="td-label">評価項目</th><th>自己</th><th>一次</th><th>二次</th><th>三次</th><th>四次</th><th>平均</th></tr>';
 QKEYS.forEach(k=>{
 const self=byRole.self?byRole.self.scores[k]:'—';
 const first=byRole.first?byRole.first.scores[k]:'—';
 const second=byRole.second?byRole.second.scores[k]:'—';
+const third=byRole.third?byRole.third.scores[k]:'—';
+const fourth=byRole.fourth?byRole.fourth.scores[k]:'—';
 const avg=avgScores[k]?avgScores[k].toFixed(1):'—';
-tbl.innerHTML+=`<tr><td class="td-label">${QLABELS[k]}</td><td>${self}</td><td>${first}</td><td>${second}</td><td><strong>${avg}</strong></td></tr>`;
+tbl.innerHTML+=`<tr><td class="td-label">${QLABELS[k]}</td><td>${self}</td><td>${first}</td><td>${second}</td><td>${third}</td><td>${fourth}</td><td><strong>${avg}</strong></td></tr>`;
 });
 }
 function updateFinalScore(){
