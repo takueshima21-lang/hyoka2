@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>本部調整 ＆ 全職員ランキング</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif;background:#F0F4F8;min-height:100vh;color:#1a1a1a;}
+.header{background:linear-gradient(135deg,#1F4E79,#2E75B6);color:#fff;padding:16px 20px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.header h1{font-size:17px;font-weight:700;}
+.header p{font-size:11px;opacity:.8;margin-top:2px;}
+.container{max-width:1200px;margin:0 auto;padding:16px;}
+
+/* 期間入力 */
+.period-box{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.period-box label{font-size:13px;font-weight:600;color:#555;white-space:nowrap;}
+.period-box input{font-size:14px;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;flex:1;min-width:160px;}
+.btn-load{background:#1F4E79;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.btn-load:hover{background:#163d61;}
+.btn-save-all{background:#0E7A5F;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.btn-save-all:hover{background:#0a5f49;}
+.btn-save-all:disabled{background:#aaa;cursor:not-allowed;}
+
+/* レイアウト */
+.layout{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+
+/* 調整テーブル */
+.table-box{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.table-box h2{font-size:14px;font-weight:700;margin-bottom:12px;color:#1F4E79;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:#1F4E79;color:#fff;padding:8px 10px;text-align:center;white-space:nowrap;position:sticky;top:0;}
+td{padding:7px 10px;border-bottom:1px solid #eee;vertical-align:middle;}
+tr:hover td{background:#f0f7ff;}
+.adj-input{width:70px;font-size:13px;padding:5px 6px;border:1.5px solid #ddd;border-radius:6px;text-align:center;transition:border-color .2s;}
+.adj-input:focus{outline:none;border-color:#2E75B6;}
+.adj-input.changed{border-color:#E67E22;background:#FFF8F0;}
+.final-score{font-weight:700;color:#185FA5;font-size:13px;}
+.rank-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.rank-S{background:#E1F5EE;color:#085041;}
+.rank-A{background:#E6F1FB;color:#0C447C;}
+.rank-B{background:#FAEEDA;color:#633806;}
+.rank-C{background:#FAECE7;color:#4A1B0C;}
+.rank-D{background:#FCEBEB;color:#501313;}
+.saved-mark{color:#0E7A5F;font-size:11px;margin-left:4px;}
+
+/* ランキングパネル */
+.ranking-box{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);position:sticky;top:80px;}
+.ranking-box h2{font-size:14px;font-weight:700;margin-bottom:4px;color:#1F4E79;}
+.ranking-box .sub{font-size:11px;color:#888;margin-bottom:12px;}
+.ranking-list{max-height:calc(100vh - 180px);overflow-y:auto;}
+.rank-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:6px;background:#F8FAFB;border:1px solid #eee;transition:all .3s;}
+.rank-item.top1{background:linear-gradient(135deg,#FFF8DC,#FFF3A0);border-color:#DAA520;}
+.rank-item.top2{background:linear-gradient(135deg,#F5F5F5,#E8E8E8);border-color:#A8A8A8;}
+.rank-item.top3{background:linear-gradient(135deg,#FFF0E8,#FFE0CC);border-color:#CD7F32;}
+.rank-num{font-size:16px;font-weight:700;min-width:28px;text-align:center;}
+.rank-name{font-size:12px;font-weight:600;flex:1;}
+.rank-facility{font-size:10px;color:#888;}
+.rank-score{font-size:13px;font-weight:700;color:#185FA5;}
+
+/* ローディング・メッセージ */
+.loading{text-align:center;padding:40px;color:#888;font-size:13px;}
+.msg-box{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:12px;}
+.msg-info{background:#EEF5FC;color:#0C447C;border:1px solid #BDDDF7;}
+.msg-success{background:#E1F5EE;color:#085041;border:1px solid #A8E0C8;}
+.msg-error{background:#FCEBEB;color:#501313;border:1px solid #F5C6C6;}
+
+/* トースト */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+.stats-row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.stat-card{flex:1;min-width:80px;background:#F0F4F8;border-radius:8px;padding:10px;text-align:center;}
+.stat-card .val{font-size:18px;font-weight:700;color:#1F4E79;}
+.stat-card .lbl{font-size:10px;color:#888;margin-top:2px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚙️ 本部調整 ＆ 🏆 全職員ランキング</h1>
+  <p>調整点数を入力するとリアルタイムでランキングが更新されます</p>
+</div>
+
+<div class="container">
+  <!-- 期間入力 -->
+  <div class="period-box">
+    <label>評価期間：</label>
+    <input type="text" id="period-input" value="2026年　上期" placeholder="例：2026年　上期">
+    <button class="btn-load" onclick="loadData()">📥 データ読み込み</button>
+    <button class="btn-save-all" id="btn-save" onclick="saveAll()" disabled>💾 全員の調整を保存</button>
+    <span id="save-status" style="font-size:12px;color:#888;"></span>
+  </div>
+
+  <div id="msg-area"></div>
+
+  <div class="layout">
+    <!-- 調整テーブル -->
+    <div class="table-box">
+      <h2>📋 本部調整テーブル（全職員）</h2>
+      <div id="stats-area" style="display:none;">
+        <div class="stats-row">
+          <div class="stat-card"><div class="val" id="stat-total">0</div><div class="lbl">総人数</div></div>
+          <div class="stat-card"><div class="val" id="stat-max">0</div><div class="lbl">最高点</div></div>
+          <div class="stat-card"><div class="val" id="stat-min">0</div><div class="lbl">最低点</div></div>
+          <div class="stat-card"><div class="val" id="stat-avg">0</div><div class="lbl">平均点</div></div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div id="table-area" class="loading">
+          評価期間を入力して「データ読み込み」をクリックしてください
+        </div>
+      </div>
+    </div>
+
+    <!-- ランキングパネル -->
+    <div class="ranking-box">
+      <h2>🏆 リアルタイムランキング</h2>
+      <p class="sub">調整点数を入力すると即座に反映されます</p>
+      <div class="ranking-list" id="ranking-list">
+        <div class="loading" style="padding:20px;">データ読み込み後に表示されます</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyhvsNVTrjZXhmdOhK9Iq9BHPMesOBBEf8tiQM3Je8gCu_4HQNEzFwQifm-QmmIy2cI/exec';
+
+let allRows = []; // {name, facility, roleLabel, avgTotal, adjustment, finalScore, finalRank, saved}
+
+function getRank(score) {
+  if(score >= 225) return 'S評価';
+  if(score >= 188) return 'A評価';
+  if(score >= 150) return 'B評価';
+  if(score >= 113) return 'C評価';
+  return 'D評価';
+}
+
+function showMsg(type, text) {
+  document.getElementById('msg-area').innerHTML = `<div class="msg-box msg-${type}">${text}</div>`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function loadData() {
+  const period = document.getElementById('period-input').value.trim();
+  if (!period) { showMsg('error', '評価期間を入力してください'); return; }
+
+  document.getElementById('table-area').innerHTML = '<div class="loading">⏳ データを読み込み中...</div>';
+  document.getElementById('ranking-list').innerHTML = '<div class="loading">⏳ 読み込み中...</div>';
+  document.getElementById('msg-area').innerHTML = '';
+
+  fetch(GAS_URL + '?action=ranking&period=' + encodeURIComponent(period))
+    .then(r => r.json())
+    .then(data => {
+      if (!data || !data.rows || data.rows.length === 0) {
+        showMsg('error', '📭 データが見つかりませんでした。先に各フォームの「最終スコアを確定して保存」を行ってください。');
+        document.getElementById('table-area').innerHTML = '<div class="loading">データなし</div>';
+        document.getElementById('ranking-list').innerHTML = '<div class="loading">データなし</div>';
+        return;
+      }
+      allRows = data.rows.map(r => ({
+        name: r.name || '',
+        facility: r.facility || r.cls || '',
+        roleLabel: r.roleLabel || '',
+        avgTotal: Number(r.avgTotal || r.finalScore || 0),
+        adjustment: Number(r.adjustment || 0),
+        finalScore: Number(r.finalScore || 0),
+        finalRank: r.finalRank || getRank(Number(r.finalScore || 0)),
+        saved: true
+      }));
+      buildTable();
+      updateRanking();
+      document.getElementById('btn-save').disabled = false;
+      showMsg('info', `✅ ${allRows.length}名のデータを読み込みました。調整点数を入力するとランキングがリアルタイムで更新されます。`);
+    })
+    .catch(err => {
+      showMsg('error', 'データの読み込みに失敗しました。GASのURLや権限を確認してください。');
+      document.getElementById('table-area').innerHTML = '<div class="loading">読み込みエラー</div>';
+    });
+}
+
+function buildTable() {
+  // スコア順にソートして表示
+  const sorted = [...allRows].sort((a,b) => b.finalScore - a.finalScore);
+
+  // 統計
+  const scores = allRows.map(r => r.finalScore);
+  const total = allRows.length;
+  const maxS = Math.max(...scores);
+  const minS = Math.min(...scores);
+  const avg = Math.round(scores.reduce((a,b)=>a+b,0)/total);
+  document.getElementById('stat-total').textContent = total + '名';
+  document.getElementById('stat-max').textContent = maxS + '点';
+  document.getElementById('stat-min').textContent = minS + '点';
+  document.getElementById('stat-avg').textContent = avg + '点';
+  document.getElementById('stats-area').style.display = 'block';
+
+  let html = `<table>
+    <thead><tr>
+      <th>順位</th><th>氏名</th><th>施設</th><th>役職</th>
+      <th>評価者平均</th><th>本部調整</th><th>最終点数</th><th>ランク</th>
+    </tr></thead><tbody>`;
+
+  sorted.forEach((row, i) => {
+    const idx = allRows.indexOf(row);
+    const rankClass = row.finalRank.replace('評価','');
+    html += `<tr id="tr-${idx}">
+      <td style="text-align:center;font-weight:700;color:#888;">${i+1}</td>
+      <td style="font-weight:600;">${row.name}</td>
+      <td style="color:#555;">${row.facility}</td>
+      <td style="color:#555;">${row.roleLabel}</td>
+      <td style="text-align:center;">${row.avgTotal}点</td>
+      <td style="text-align:center;">
+        <input type="number" class="adj-input" id="adj-${idx}" value="${row.adjustment}"
+          min="-50" max="50" onchange="onAdjChange(${idx})" oninput="onAdjChange(${idx})">
+      </td>
+      <td style="text-align:center;" id="final-${idx}"><span class="final-score">${row.finalScore}点</span></td>
+      <td style="text-align:center;" id="rank-${idx}"><span class="rank-badge rank-${rankClass}">${row.finalRank}</span></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('table-area').innerHTML = html;
+}
+
+function onAdjChange(idx) {
+  const input = document.getElementById('adj-'+idx);
+  const adj = parseInt(input.value) || 0;
+  allRows[idx].adjustment = adj;
+  allRows[idx].finalScore = allRows[idx].avgTotal + adj;
+  allRows[idx].finalRank = getRank(allRows[idx].finalScore);
+  allRows[idx].saved = false;
+
+  input.classList.add('changed');
+
+  // セル更新
+  const rankClass = allRows[idx].finalRank.replace('評価','');
+  document.getElementById('final-'+idx).innerHTML = `<span class="final-score">${allRows[idx].finalScore}点</span>`;
+  document.getElementById('rank-'+idx).innerHTML = `<span class="rank-badge rank-${rankClass}">${allRows[idx].finalRank}</span>`;
+
+  // ランキング更新
+  updateRanking();
+
+  // テーブルの順位列を更新
+  updateTableRanks();
+}
+
+function updateTableRanks() {
+  const sorted = [...allRows].sort((a,b) => b.finalScore - a.finalScore);
+  sorted.forEach((row, i) => {
+    const idx = allRows.indexOf(row);
+    const tr = document.getElementById('tr-'+idx);
+    if(tr) tr.cells[0].textContent = i+1;
+  });
+}
+
+function updateRanking() {
+  const sorted = [...allRows].sort((a,b) => b.finalScore - a.finalScore);
+  const MEDAL = ['🥇','🥈','🥉'];
+  const TOP_CLASS = ['top1','top2','top3'];
+
+  let html = '';
+  sorted.forEach((row, i) => {
+    const rank = i+1;
+    const medal = rank<=3 ? MEDAL[rank-1] : rank+'位';
+    const tc = rank<=3 ? TOP_CLASS[rank-1] : '';
+    const rankClass = row.finalRank.replace('評価','');
+    html += `<div class="rank-item ${tc}">
+      <div class="rank-num">${medal}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="rank-name">${row.name}</div>
+        <div class="rank-facility">${row.facility}　<span class="rank-badge rank-${rankClass}" style="font-size:10px;padding:1px 6px;">${row.finalRank}</span></div>
+      </div>
+      <div class="rank-score">${row.finalScore}点</div>
+    </div>`;
+  });
+
+  document.getElementById('ranking-list').innerHTML = html;
+}
+
+function saveAll() {
+  const period = document.getElementById('period-input').value.trim();
+  const unsaved = allRows.filter(r => !r.saved);
+  if(unsaved.length === 0) { showToast('変更はありません'); return; }
+
+  document.getElementById('btn-save').disabled = true;
+  document.getElementById('save-status').textContent = '保存中...';
+
+  // 変更があった全員を保存
+  const promises = allRows.map(row => {
+    const payload = {
+      action: 'finalize',
+      target: row.name,
+      period: period,
+      avgTotal: row.avgTotal,
+      adjustment: row.adjustment,
+      adjustReason: '',
+      finalScore: row.finalScore,
+      finalRank: row.finalRank
+    };
+    return fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+  });
+
+  Promise.all(promises)
+    .then(() => {
+      allRows.forEach(r => r.saved = true);
+      document.querySelectorAll('.adj-input').forEach(el => el.classList.remove('changed'));
+      document.getElementById('save-status').textContent = `✅ ${allRows.length}名を保存しました`;
+      document.getElementById('btn-save').disabled = false;
+      showToast('✅ 全員の調整を保存しました！');
+    })
+    .catch(() => {
+      document.getElementById('save-status').textContent = '✅ 保存しました';
+      document.getElementById('btn-save').disabled = false;
+      showToast('✅ 保存しました');
+    });
+}
+</script>
+</body>
+</html>
